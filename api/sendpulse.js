@@ -106,8 +106,7 @@ function sendRequest(path, method, data, useToken, callback){
             var str = '';
             response.on('data', function (chunk) {
                 if (response.statusCode==401) {
-                    getToken();
-                    sendRequest(path, method, data, true, callback);
+                    getToken(() => { sendRequest(path, method, data, true, callback); } );
                 } else {
                     str += chunk;
                 }
@@ -133,7 +132,7 @@ function sendRequest(path, method, data, useToken, callback){
  * Get token and store it
  *
  */
-function getToken(){
+function getToken(cb){
     var data={
         grant_type:'client_credentials',
         client_id: API_USER_ID,
@@ -144,6 +143,7 @@ function getToken(){
         TOKEN = data.access_token;
         var hashName = md5(API_USER_ID+'::'+API_SECRET);
         fs.writeFileSync(TOKEN_STORAGE+hashName, TOKEN);
+        cb && cb();
     }
 }
 
